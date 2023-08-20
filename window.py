@@ -1,13 +1,16 @@
 import tkinter as tk
+from tkinter.messagebox import showinfo
 from tkinter import ttk
-from register import *
+from register import * 
 
 root = tk.Tk()
 
 class Aplication():
 
     client_list = []
-
+    
+    counterId = 0
+    
     def __init__(self):
         self.root = root
         self.Tela()
@@ -17,11 +20,13 @@ class Aplication():
         root.mainloop()
 
     def Tela(self):
+        
         self.root.title("Cadastro de clientes")
         self.root.configure(background= 'blue')
-        self.root.geometry("550x400")
+        self.root.geometry("700x500")
         self.root.resizable(True, True)     
     def set_frames(self):
+        
         self.frame_1 = tk.Frame(self.root, bd = 4, bg = "lightblue", 
                                 highlightbackground= "darkblue", highlightthickness= 3)
         self.frame_1.place(relx=0.02, rely=0.02, relwidth=0.96, relheight=0.46)   
@@ -29,9 +34,10 @@ class Aplication():
                                 highlightbackground= "darkblue", highlightthickness= 3)
         self.frame_2.place(relx=0.02, rely=0.5, relwidth=0.96, relheight=0.46)
     def widgets_frame1(self):
+        
         ## Botão Limpar
         self.bt_limpar = tk.Button(self.frame_1, text="Limpar", border=2, bg="white",
-                                    fg="black", font=("Verdana", 8, "bold"))
+                                    fg="black", font=("Verdana", 8, "bold"), command=self.bttn_clear)
         self.bt_limpar.place(relx=0.19, rely=0.15, relwidth=0.12, relheight=0.15)
 
         ## Botão Buscar
@@ -101,29 +107,51 @@ class Aplication():
     def widgets_frame2(self):
         ## Treeview
         self.listClient = ttk.Treeview(self.frame_2, height=3,
-        columns=("col1", "col2", "col3", "col4", "col5"))
-        #self.listClient.heading("#0", text="")
-        self.listClient.heading("#0", text="Codigo")
-        self.listClient.heading("#1", text="Nome")
-        self.listClient.heading("#2", text="CPF")
-        self.listClient.heading("#3", text="Telefone")
-        self.listClient.heading("#4", text="Cidade")
+        columns=("col0", "col1", "col2", "col3", "col4", "col5"))
+        self.listClient.heading("#0", text="")
+        self.listClient.heading("#1", text="Codigo")
+        self.listClient.heading("#2", text="Nome")
+        self.listClient.heading("#3", text="CPF")
+        self.listClient.heading("#4", text="Telefone")
+        self.listClient.heading("#5", text="Cidade")
 
-        self.listClient.column("#0", width=50)
-        self.listClient.column("#1", width=125)
-        self.listClient.column("#2", width=125)
-        self.listClient.column("#3", width=90)
-        self.listClient.column("#4", width=125)
-        self.listClient.column("#5", width=125)
+        self.listClient.column("#0", width=5)
+        self.listClient.column("#1", width=50)
+        self.listClient.column("#2", width=150)
+        self.listClient.column("#3", width=100)
+        self.listClient.column("#4", width=100)
+        self.listClient.column("#5", width=150)
 
         self.listClient.place(relx=0.01, rely=0.1, relheight=0.85, relwidth=0.95)
+        
+        self.scrollLista = tk.Scrollbar(self.frame_2, orient='vertical')
+        self.listClient.configure(yscroll=self.scrollLista.set)
+        self.scrollLista.place(relx=0.96, rely=0.1, relwidth=0.03, relheight=0.85)
 
     def bttn_new(self):
-        self.client_list.append(Register(self.input_codigo.get(), self.input_nome.get(), self.input_cpf.get(),
+        self.client_list.append(Register(self.counterId + 1, self.input_nome.get(), self.input_cpf.get(),
                 self.input_tel.get(), self.input_cidade.get()))
-        print(self.client_list[0].__repr__())
+        self.counterId += 1
+        # print(self.client_list[0].__str__())
         
+        tk.messagebox.showinfo(title="Aviso", message="Cliente adicionado")
+        
+        self.listClient.delete(*self.listClient.get_children())
+        
+        for client in self.client_list:
+            self.listClient.insert("", tk.END, values=client)
+        
+    def bttn_clear(self):
+        self.input_nome.delete(0, 'end')
+        self.input_cidade.delete(0, 'end')
+        self.input_codigo.delete(0, 'end')
+        self.input_cpf.delete(0, 'end')
+        self.input_tel.delete(0, 'end')
 
-
+    def bttn_change(self):
+        return
+    
+    def bttn_delete(self):
+        return     
 
 Aplication()

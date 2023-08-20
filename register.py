@@ -8,7 +8,7 @@ class Register():
        self.city = city
 
     def __str__(self):
-        return f"Register: id={self.id}, name={self.name}, cpf={self.cpf}, city={self.city}"
+        return f"{self.id} {self.name} {self.cpf} {self.tel} {self.city}"
 
     def getId(self) -> int:
         return self.id
