@@ -2,12 +2,87 @@ import tkinter as tk
 from tkinter.messagebox import showinfo
 from tkinter import ttk
 from register import * 
+import sqlite3
 
 root = tk.Tk()
 
-class Aplication():
+class Functions():
+    def bttn_new(self):
+        # self.client_list.append(Register(self.counterId + 1, self.input_nome.get(), self.input_cpf.get(),
+        # self.input_tel.get(), self.input_cidade.get()))
+        # self.counterId += 1
+        # print(self.client_list[0].__str__())
 
-    client_list = []
+        self.name = self.input_nome.get()
+        self.cpf = self.input_cpf.get()
+        self.tel = self.input_tel.get()
+        self.city = self.input_cidade.get()
+
+        self.conect_BD()
+        self.cursor.execute(""" INSERT INTO clients(name, cpf, tel, city)
+                            VALUES(?, ?, ?, ?)""", (self.name, self.cpf, self.tel, self.city))
+        self.conn.commit()
+        self.disconect_BD()
+        
+        tk.messagebox.showinfo(title="Aviso", message="Cliente adicionado")
+
+        # self.listClient.delete(*self.listClient.get_children())
+        
+        # for client in self.client_list:
+        #     self.listClient.insert("", tk.END, values=client)
+
+        self.select_list()
+        self.bttn_clear()        
+            
+    def select_list(self):
+            self.listClient.delete(*self.listClient.get_children())
+            self.conect_BD()
+
+            client_list = self.cursor.execute(""" SELECT cod, name, cpf, tel, city FROM clients
+                                              ORDER BY name ASC; """)
+            
+            for client in client_list:
+                self.listClient.insert("", tk.END, values = client)
+
+            self.disconect_BD()
+    
+    def bttn_clear(self):
+        self.input_nome.delete(0, 'end')
+        self.input_cidade.delete(0, 'end')
+        self.input_codigo.delete(0, 'end')
+        self.input_cpf.delete(0, 'end')
+        self.input_tel.delete(0, 'end')
+
+    def bttn_change(self):
+        return
+    
+    def bttn_delete(self):
+        return     
+    
+    def conect_BD(self):
+        self.conn = sqlite3.connect("PESGOL-CLIENTS-BD")
+        self.cursor = self.conn.cursor()
+        print("Conectando ao BD")
+
+    def disconect_BD(self):
+        self.conn.close()
+
+    def createTables(self):
+        self.conect_BD()
+        ## criar tabela
+        self.cursor.execute("""
+                            CREATE TABLE IF NOT EXISTS clients(
+                            cod INTEGER PRIMARY KEY AUTOINCREMENT,
+                            name CHAR(40) NOT NULL,
+                            cpf VARCHAR(20) UNIQUE,
+                            tel INTEGER(20),
+                            city CHAR(40)   
+                            );
+                        """)
+        self.conn.commit(); print("Banco de dados criado")
+        self.disconect_BD()        
+
+class Aplication(Functions):
     
     counterId = 0
     
@@ -17,6 +92,8 @@ class Aplication():
         self.set_frames()
         self.widgets_frame1()
         self.widgets_frame2()
+        self.createTables()
+        self.select_list()
         root.mainloop()
 
     def Tela(self):
@@ -24,7 +101,8 @@ class Aplication():
         self.root.title("Cadastro de clientes")
         self.root.configure(background= 'blue')
         self.root.geometry("700x500")
-        self.root.resizable(True, True)     
+        self.root.resizable(True, True)  
+
     def set_frames(self):
         
         self.frame_1 = tk.Frame(self.root, bd = 4, bg = "lightblue", 
@@ -33,6 +111,7 @@ class Aplication():
         self.frame_2 = tk.Frame(self.root, bd = 4, bg = "lightblue", 
                                 highlightbackground= "darkblue", highlightthickness= 3)
         self.frame_2.place(relx=0.02, rely=0.5, relwidth=0.96, relheight=0.46)
+
     def widgets_frame1(self):
         
         ## Botão Limpar
@@ -104,6 +183,7 @@ class Aplication():
         ## Entry Cidade
         self.input_cidade = tk.Entry(self.frame_1)
         self.input_cidade.place(relx=0.55, rely=0.78, relwidth=0.435, relheight=0.15)
+    
     def widgets_frame2(self):
         ## Treeview
         self.listClient = ttk.Treeview(self.frame_2, height=3,
@@ -127,31 +207,5 @@ class Aplication():
         self.scrollLista = tk.Scrollbar(self.frame_2, orient='vertical')
         self.listClient.configure(yscroll=self.scrollLista.set)
         self.scrollLista.place(relx=0.96, rely=0.1, relwidth=0.03, relheight=0.85)
-
-    def bttn_new(self):
-        self.client_list.append(Register(self.counterId + 1, self.input_nome.get(), self.input_cpf.get(),
-                self.input_tel.get(), self.input_cidade.get()))
-        self.counterId += 1
-        # print(self.client_list[0].__str__())
-        
-        tk.messagebox.showinfo(title="Aviso", message="Cliente adicionado")
-        
-        self.listClient.delete(*self.listClient.get_children())
-        
-        for client in self.client_list:
-            self.listClient.insert("", tk.END, values=client)
-        
-    def bttn_clear(self):
-        self.input_nome.delete(0, 'end')
-        self.input_cidade.delete(0, 'end')
-        self.input_codigo.delete(0, 'end')
-        self.input_cpf.delete(0, 'end')
-        self.input_tel.delete(0, 'end')
-
-    def bttn_change(self):
-        return
-    
-    def bttn_delete(self):
-        return     
 
 Aplication()
