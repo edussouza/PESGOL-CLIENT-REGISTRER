@@ -20,11 +20,11 @@ class Aplication():
         root.mainloop()
 
     def Tela(self):
-        
         self.root.title("Cadastro de clientes")
         self.root.configure(background= 'blue')
         self.root.geometry("700x500")
-        self.root.resizable(True, True)     
+        self.root.resizable(True, True) 
+            
     def set_frames(self):
         
         self.frame_1 = tk.Frame(self.root, bd = 4, bg = "lightblue", 
@@ -33,8 +33,8 @@ class Aplication():
         self.frame_2 = tk.Frame(self.root, bd = 4, bg = "lightblue", 
                                 highlightbackground= "darkblue", highlightthickness= 3)
         self.frame_2.place(relx=0.02, rely=0.5, relwidth=0.96, relheight=0.46)
-    def widgets_frame1(self):
         
+    def widgets_frame1(self):        
         ## Botão Limpar
         self.bt_limpar = tk.Button(self.frame_1, text="Limpar", border=2, bg="white",
                                     fg="black", font=("Verdana", 8, "bold"), command=self.bttn_clear)
@@ -57,7 +57,7 @@ class Aplication():
 
         ## Botão Apagar
         self.bt_apagar = tk.Button(self.frame_1, text="Apagar", border=2, bg="white",
-                                    fg="black", font=("Verdana", 8, "bold"))
+                                    fg="black", font=("Verdana", 8, "bold"), command=self.bttn_delete)
         self.bt_apagar.place(relx=0.81, rely=0.15, relwidth=0.12, relheight=0.15)
 
         ## Labels Codigo
@@ -104,6 +104,7 @@ class Aplication():
         ## Entry Cidade
         self.input_cidade = tk.Entry(self.frame_1)
         self.input_cidade.place(relx=0.55, rely=0.78, relwidth=0.435, relheight=0.15)
+        
     def widgets_frame2(self):
         ## Treeview
         self.listClient = ttk.Treeview(self.frame_2, height=3,
@@ -130,7 +131,7 @@ class Aplication():
 
     def bttn_new(self):
         self.client_list.append(Register(self.counterId + 1, self.input_nome.get(), self.input_cpf.get(),
-                self.input_tel.get(), self.input_cidade.get()))
+        self.input_tel.get(), self.input_cidade.get()))
         self.counterId += 1
         # print(self.client_list[0].__str__())
         
@@ -148,10 +149,20 @@ class Aplication():
         self.input_cpf.delete(0, 'end')
         self.input_tel.delete(0, 'end')
 
-    def bttn_change(self):
+    def bttn_update(self):
         return
     
     def bttn_delete(self):
-        return     
+        self.selected_item = self.listClient.selection()[0]
+        
+        self.client_list.pop(self.selected_item)
+        
+        tk.messagebox.showinfo(title="Aviso", message="Cliente removido")
+        
+        self.listClient.delete(self.selected_item)
+        for client in self.client_list:
+            self.listClient.insert("", tk.END, values=client)
+           
+                   
 
 Aplication()
